@@ -39,3 +39,10 @@ We introduce a risk model to the provided data. The following section describes 
 
 
 ## 2) Clustering clients to find outliers 
+
+We attemted to find outstanding characteristics of criminal records. In this part we focused on physical persons only.
+Examples of successful analysis are as following:
+1. Coupling the transaction count with the io_ratio, two distinctive distributions are found where one corresponds to the suspicious clients, and the other to the rest. [image 1].
+This results in 500 hits with less than 2% false positive. There is still room for improving the model's precision.  
+
+2. Clustering the clients allows for   
