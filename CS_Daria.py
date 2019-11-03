@@ -7,137 +7,146 @@ Created on Sat Nov  2 11:13:16 2019
 """
 import csv
 
-
-import pandas
-
 import numpy
-
-import pandas
 
 import matplotlib.pyplot as plt
 
+import math as m
 
-countline = 0
 
+### Caushy distribution with parameters
+def Caushy (x, g, x0, A):
+    return float((A/m.pi)*g/((x-x0)**2+g*g))
 
 
 cif = '\ufeffcif'
 cif = 'cif'
 
-###AS IT IS ALREADY ONCE READ - NEAD TO BE UNCOMMENTED
-#susplist = []
-#with open('jeopardy.csv', 'r') as susp:
-#    
-#    reader = csv.DictReader(susp, delimiter = ",")
-#    
-#    for line in reader:
-#        if int(line['suspicious']) == 1:
-#            susplist.append(int(line[cif]))
-#            #print('y')
-#    
-#
-#print(len(susplist))        
-#    
-    
-#parameters that we set here^ but then up to correct
-#CASH_bound = 0.005
-#
-#inact_DAYS_1 = 150
-#inact_DAYS_2 = 16
-#
-#SAVING_bound = 0.9
-#
-#AGE = 21
-#
-#IO_DELTA = 0.005
-#MUCH_MONEY = 10000000
-#
-####RED FLAGS ABOUT 
-#cc = 0
-#
-#
-#YOUNG =0
-#YOUNG_TURNOVER =0
 
-#with open('large.csv', 'r') as small:
-#    reader = csv.DictReader(small, delimiter = ",")
-#    
-#    for line in reader:
-#        cc+= 1
-#        if int(line['age']) >0 :
-#            if int(line['age']) < AGE:
-#                YOUNG += 1
-#                YOUNG_TURNOVER += float(line['turnover'])
-#                
-#                
-#print(YOUNG_TURNOVER/YOUNG)                
+#data_all_X = []
+#data_all_Y = []
+#data_susp_X = []
+#data_susp_Y = []
 
-
-
-
-
-#data_large = pandas.read_csv("large.csv")
-#data_small = pandas.read_csv("small.csv")
-#
-#data_ind_small = data_small[data_small['category'] == 0]
-#
-#
-#
-#
-#
-#
-#
-
-def normalize(v):
-    norm = np.linalg.norm(v)
-    if norm == 0: 
-       return v
-    return v / norm
-
-data_all_X = []
-data_all_Y = []
-data_susp_X = []
-data_susp_Y = []
 
 a1_all_X = []
 a1_all_Y = []
 a1_susp_X = []
 a1_susp_Y = []
-with open('large.csv', 'r') as small:
-    reader = csv.DictReader(small, delimiter = ",")     
+a1_non_X = []
+a1_non_Y = []
+
+
+
+
+with open('large.csv', 'r') as data:
+    reader = csv.DictReader(data, delimiter = ",")     
     for line in reader:
         if int(line['category']) == 0 and int(line['age']) > 0 and int(line['age']) >0:
-            
-            
-#            
-            data_all_X.append(float(line['turnover']))
-            data_all_Y.append(int(line['transaction_count']))
-            if int(line[cif]) in susplist:
-                data_susp_X.append(float(line['turnover']))
-                data_susp_Y.append(int(line['transaction_count']))            
-        
-            
+           
             
             a1_all_X.append(float(line['io_ratio']))
             a1_all_Y.append(float(line['transaction_count']))
             if int(line[cif]) in susplist:
                 a1_susp_X.append(float(line['io_ratio']))
-                a1_susp_Y.append(float(line['transaction_count']))            
+                a1_susp_Y.append(float(line['transaction_count']))
+            else:
+                a1_non_X.append(float(line['io_ratio']))
+                a1_non_Y.append(float(line['transaction_count']))
+            
         
+
+#### OBSERVE how different the distributions are!!!!
         
-plt.plot(a1_all_X, a1_all_Y, 'bs')
-plt.plot (a1_susp_X, a1_susp_Y, 'r^')
+plt.plot(a1_not_X, a1_not_Y, 'bs')
+plt.plot (a1_susp_X, a1_susp_Y, 'k^')
 plt.show()        
 
 
 
-plt.plot(data_all_X, data_all_Y, 'bs')
-plt.plot (data_susp_X, data_susp_Y, 'r^')
-plt.show()        
+### HERE the choice of parameters was performed
+### the tails of both distributions are too heavy to be gaussian
+### so the Caushy distribution was chosen
+### now the parameters are chosen manually, that can easily be improved 
+### (optimisation problem solved by gradient descent technique ex.g)
+
+
+
+gn = 0.07
+x0n = 0.3
+An = 200
+
+gs = 0.045
+x0s = 0.41
+As = 250
+
+x = np.arange(0., 1., 0.01)
+ys = [Caushy(xx, gs, x0s, As) for xx in x]
+yn = [Caushy(xx, gn, x0n, An) for xx in x]
+
+#### the curves describes nicely the shape of the data
+plt.plot(a1_non_X, a1_non_Y, 'bs')
+plt.plot (a1_susp_X, a1_susp_Y, 'ks')
+plt.plot(x, yn, 'g-')
+plt.plot(x, ys, 'r-')
+plt.plot(flag_x, flag_y, 'r^')
+plt.show()
+
+### final parameters for not suspicious people
+pn = (gn,x0n,An)
+
+
+
+def outlayers_D (io, trans, param, eps = 50):
+### this function detect people acting suspicious comparing the following parameters:
+### IO_ratio and transaction number
+### not suspicious people fit perfectly inside the bell of Caushy distribution
+### suspicious people lie in the distribution with different parameters
+### returns True if the person doesn't fit the first bell
+    
+### the parameters for the Caushy distribution could be found more sophisticatly
+
+### the parameret eps is an error margin, can be determined nices
+### but even taken to be 0 gives only 6(!) not suspicious people out of the line
+    F0 = Caushy(io, param[0], param[1], param[2])
+    if F0 + eps < trans:
+        return True
+    else:
+        return False
 
 
 
 
+### that gonna be the list of rised flags
+FLAG_D = []
+
+### to be shown on a plot
+flag_x = []
+flag_y = []
+
+
+with open('large.csv', 'r') as data:
+    
+    reader = csv.DictReader(data, delimiter = ",")     
+    for line in reader:
+        if int(line['category']) == 0 and int(line['age']) > 0:
+           if outlayers_D(float(line['io_ratio']), float(line['transaction_count']), pn):
+               flag_x.append(float(line['io_ratio']))
+               flag_y.append(float(line['transaction_count']))
+               FLAG_D.append(int(line[cif]))
+
+
+plt.plot(a1_non_X, a1_non_Y, 'bs')
+plt.plot (a1_susp_X, a1_susp_Y, 'ks')
+plt.plot(x, yn, 'g-')
+plt.plot(flag_x, flag_y, 'r^')
+plt.show() 
+
+
+
+### nothing important
+
+#### THERE SOME DATA PLAYS WERE PERFORMED
 # =============================================================================
 
 #data_1 = []
@@ -149,6 +158,16 @@ plt.show()
 #
 #dd_toNtrans = []
 #
+
+
+
+
+
+def normalize(v):
+    norm = np.linalg.norm(v)
+    if norm == 0: 
+       return v
+    return v / norm
 
 # =============================================================================
 # 
@@ -412,3 +431,69 @@ plt.show()
 #
 #
 ##plt.hist(hyst_CASH_percent, bins = N_hyst)
+
+
+
+###AS IT IS ALREADY ONCE READ - NEAD TO BE UNCOMMENTED
+#susplist = []
+#with open('jeopardy.csv', 'r') as susp:
+#    
+#    reader = csv.DictReader(susp, delimiter = ",")
+#    
+#    for line in reader:
+#        if int(line['suspicious']) == 1:
+#            susplist.append(int(line[cif]))
+#            #print('y')
+#    
+#
+#print(len(susplist))        
+#    
+    
+#parameters that we set here^ but then up to correct
+#CASH_bound = 0.005
+#
+#inact_DAYS_1 = 150
+#inact_DAYS_2 = 16
+#
+#SAVING_bound = 0.9
+#
+#AGE = 21
+#
+#IO_DELTA = 0.005
+#MUCH_MONEY = 10000000
+#
+####RED FLAGS ABOUT 
+#cc = 0
+#
+#
+#YOUNG =0
+#YOUNG_TURNOVER =0
+
+#with open('large.csv', 'r') as small:
+#    reader = csv.DictReader(small, delimiter = ",")
+#    
+#    for line in reader:
+#        cc+= 1
+#        if int(line['age']) >0 :
+#            if int(line['age']) < AGE:
+#                YOUNG += 1
+#                YOUNG_TURNOVER += float(line['turnover'])
+#                
+#                
+#print(YOUNG_TURNOVER/YOUNG)                
+
+
+
+
+
+#data_large = pandas.read_csv("large.csv")
+#data_small = pandas.read_csv("small.csv")
+#
+#data_ind_small = data_small[data_small['category'] == 0]
+#
+#
+#
+#
+#
+#
+#
