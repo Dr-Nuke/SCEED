@@ -4,6 +4,11 @@
 Created on Sat Nov  2 11:13:16 2019
 
 @author: Daria
+
+here are my attempts to beating the problem of fraud and money laundry given by Credit Suisse
+
+earlier [and failing] ones are commented in the end of the file, with the description
+the one presented is on the top, with comments
 """
 import csv
 
@@ -39,6 +44,20 @@ a1_non_Y = []
 
 
 
+##the list of suspicious accounts provided by credit Suisse
+susplist = []
+with open('jeopardy.csv', 'r') as susp:
+    
+    reader = csv.DictReader(susp, delimiter = ",")
+    
+    for line in reader:
+        if int(line['suspicious']) == 1:
+            susplist.append(int(line[cif]))
+            #print('y')
+    
+#
+#print(len(susplist))     
+
 with open('large.csv', 'r') as data:
     reader = csv.DictReader(data, delimiter = ",")     
     for line in reader:
@@ -54,6 +73,9 @@ with open('large.csv', 'r') as data:
                 a1_non_X.append(float(line['io_ratio']))
                 a1_non_Y.append(float(line['transaction_count']))
             
+            
+            ## here some play with the data was performed
+            ## unfortunately it gave almost no results up to this hit
         
 
 #### OBSERVE how different the distributions are!!!!
@@ -145,9 +167,24 @@ plt.show()
 
 
 ### nothing important
-
-#### THERE SOME DATA PLAYS WERE PERFORMED
+'''
+THERE SOME DATA PLAYS WERE PERFORMED
+'''
 # =============================================================================
+''' 
+this part was devoted to straightforward clustering
+chosen a bunch of parameters (normalised if needed)
+we tried to separate all data by distinced clusters
+unfortunately the approach seemed not so promicing
+no non-trivial clusters with significant changes of suspiciuos activivty were found
+then we switched to reducing dimentions
+
+'''
+
+
+
+
+
 
 #data_1 = []
 #data_num = []
@@ -161,16 +198,15 @@ plt.show()
 
 
 
-
-
-def normalize(v):
-    norm = np.linalg.norm(v)
-    if norm == 0: 
-       return v
-    return v / norm
-
-# =============================================================================
-# 
+#
+#
+#def normalize(v):
+#    norm = np.linalg.norm(v)
+#    if norm == 0: 
+#       return v
+#    return v / norm
+#
+#
 # data_0 = []
 # #with open('large.csv', 'r') as small:
 # with open('small.csv', 'r') as small:
@@ -250,59 +286,25 @@ def normalize(v):
 #     RES.append([susptot/stot, stot])
 # 
 # print(sum([RES[i][0]>0 for i in range(numb_clust)]))
+
+
+
+
 # =============================================================================
 # =============================================================================
 # 
-# 
+'''
+here we were checking the ideas of the crimes scenarios
+we were worried about the older people and the usage of their accounts
+and the young peole used for a money flow
+unfortunately this didn't lead to any reliable result
+
+'''
 # with open('small.csv', 'r') as small:
 # #with open('large.csv', 'r') as small:
 # 
 #     reader = csv.DictReader(small, delimiter = ",")
-# 
-#
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
+#     
 #    NUM_cash = 0
 #    reader = csv.DictReader(small, delimiter = ",")
 #    
