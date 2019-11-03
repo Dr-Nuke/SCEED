@@ -16,7 +16,7 @@ We introduce a risk model to the provided data. The following section describes 
 combining the top 5% clients in transaction count with the top half of CPI ranked countries results in 13'000
 
 
-12'700 hits for the top 5% clients in turnover combined with the top half of CPI ranked countr
+12'700 hits for the top 5% clients in turnover combined with the top half of CPI ranked country\n
 12'700 hits for the top 5% clients in transaction count combined with the top half of CPI ranked countries
 23'000 hits for the 0.5 io_ration clients within the top half of corrupt CPI countries
 29'000 hits for the unity io_ration clients within the top half of corrupt CPI countries
