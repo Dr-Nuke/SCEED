@@ -120,6 +120,7 @@ def outlayers_D (io, trans, param, eps = 50):
 ### that gonna be the list of rised flags
 FLAG_D = []
 
+### to be shown on a plot
 flag_x = []
 flag_y = []
 
@@ -142,6 +143,8 @@ plt.plot(flag_x, flag_y, 'r^')
 plt.show() 
 
 
+
+### nothing important
 
 #### THERE SOME DATA PLAYS WERE PERFORMED
 # =============================================================================
