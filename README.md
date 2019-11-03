@@ -4,6 +4,8 @@
 
 ===
 
+details in model.ipynb
+
 ## 1) Risk monitoring model based on targeted controls to filter out the most suspicious accounts
 
 One of our key approaches was to build a total of 13 risk controls based on the dataset provided by CS.
