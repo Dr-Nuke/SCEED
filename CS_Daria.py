@@ -13,9 +13,8 @@ import matplotlib.pyplot as plt
 
 import math as m
 
-countline = 0
 
-
+### Caushy distribution with parameters
 def Caushy (x, g, x0, A):
     return float((A/m.pi)*g/((x-x0)**2+g*g))
 
@@ -29,6 +28,7 @@ cif = 'cif'
 #data_susp_X = []
 #data_susp_Y = []
 
+
 a1_all_X = []
 a1_all_Y = []
 a1_susp_X = []
@@ -38,18 +38,9 @@ a1_non_Y = []
 
 
 
-gn = 0.07
-x0n = 0.3
-An = 200
 
-
-gs = 0.045
-x0s = 0.41
-As = 250
-
-
-with open('large.csv', 'r') as small:
-    reader = csv.DictReader(small, delimiter = ",")     
+with open('large.csv', 'r') as data:
+    reader = csv.DictReader(data, delimiter = ",")     
     for line in reader:
         if int(line['category']) == 0 and int(line['age']) > 0 and int(line['age']) >0:
            
@@ -64,15 +55,20 @@ with open('large.csv', 'r') as small:
                 a1_non_Y.append(float(line['transaction_count']))
             
         
+
+#### OBSERVE how different the distributions are!!!!
         
-plt.plot(a1_all_X, a1_all_Y, 'bs')
-plt.plot (a1_susp_X, a1_susp_Y, 'r^')
+plt.plot(a1_not_X, a1_not_Y, 'bs')
+plt.plot (a1_susp_X, a1_susp_Y, 'k^')
 plt.show()        
 
 
 
-x = np.arange(0., 1., 0.01)
-
+### HERE the choice of parameters was performed
+### the tails of both distributions are too heavy to be gaussian
+### so the Caushy distribution was chosen
+### now the parameters are chosen manually, that can easily be improved 
+### (optimisation problem solved by gradient descent technique ex.g)
 
 
 
@@ -80,37 +76,48 @@ gn = 0.07
 x0n = 0.3
 An = 200
 
-
-###
 gs = 0.045
 x0s = 0.41
 As = 250
+
+x = np.arange(0., 1., 0.01)
 ys = [Caushy(xx, gs, x0s, As) for xx in x]
-
-
-
 yn = [Caushy(xx, gn, x0n, An) for xx in x]
 
+#### the curves describes nicely the shape of the data
+plt.plot(a1_non_X, a1_non_Y, 'bs')
+plt.plot (a1_susp_X, a1_susp_Y, 'ks')
+plt.plot(x, yn, 'g-')
+plt.plot(x, ys, 'r-')
+plt.plot(flag_x, flag_y, 'r^')
+plt.show()
 
-
+### final parameters for not suspicious people
 pn = (gn,x0n,An)
 
 
 
-def outlayers_D (io, trans, param, eps = 100):
+def outlayers_D (io, trans, param, eps = 50):
 ### this function detect people acting suspicious comparing the following parameters:
 ### IO_ratio and transaction number
 ### not suspicious people fit perfectly inside the bell of Caushy distribution
 ### suspicious people lie in the distribution with different parameters
 ### returns True if the person doesn't fit the first bell
     
-### the parameters for the Caushy distribution could be found 
+### the parameters for the Caushy distribution could be found more sophisticatly
+
+### the parameret eps is an error margin, can be determined nices
+### but even taken to be 0 gives only 6(!) not suspicious people out of the line
     F0 = Caushy(io, param[0], param[1], param[2])
     if F0 + eps < trans:
         return True
     else:
         return False
 
+
+
+
+### that gonna be the list of rised flags
 FLAG_D = []
 
 flag_x = []
@@ -119,7 +126,7 @@ flag_y = []
 
 with open('large.csv', 'r') as data:
     
-    reader = csv.DictReader(small, delimiter = ",")     
+    reader = csv.DictReader(data, delimiter = ",")     
     for line in reader:
         if int(line['category']) == 0 and int(line['age']) > 0:
            if outlayers_D(float(line['io_ratio']), float(line['transaction_count']), pn):
