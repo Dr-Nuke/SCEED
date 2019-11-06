@@ -1,3 +1,5 @@
+##This is the repository of Team SCEED's project at the Hack'n'Lead 2019 Hackathon.
+
 [Hack n Lead 2019](https://womenplusplus.ch/hacknlead)
 
 # SCEED: Future focused AML risk model
